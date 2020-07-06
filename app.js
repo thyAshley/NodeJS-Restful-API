@@ -1,28 +1,22 @@
 const express = require("express");
 const app = express();
 
-app.use((req, res, next) => {
-  console.log("in middleware");
-  next();
+const { adminRoutes } = require("./routes/admin");
+const { shopRoutes } = require("./routes/shop");
+
+/* Set up middleware for express */
+app.use(express.urlencoded({ extended: true }));
+
+/* Set up Routers for express */
+app.use("/admin", adminRoutes);
+app.use(shopRoutes);
+
+/* 404 Page */
+app.use("/", (req, res) => {
+  res.status(404).send("THIS PAGE DOES NOT EXIST");
 });
 
-app.use((req, res, next) => {
-  console.log("in middleware 2");
-  res.send("<h1>Hello from Middleware</h1>");
-});
-
+/* Start server */
 app.listen(3000, () => {
   console.log("server started on port 3000");
 });
-
-app.route("/").get((req, res) => {
-  res.end("hello");
-});
-
-// const { requestHandler } = require("./routes");
-
-// const server = http.createServer(requestHandler);
-
-// server.listen(3000, () => {
-//   console.log("port started on port 3000");
-// });
