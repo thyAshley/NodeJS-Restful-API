@@ -10,6 +10,7 @@ const { shopRoutes } = require("./routes/shop");
 
 /* Set up middleware for express */
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
 /* Set up Routers for express */
 app.use("/admin", adminRoutes);
