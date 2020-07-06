@@ -4,11 +4,10 @@ const productController = require("../controllers/productsController");
 
 const router = express.Router();
 
-// /admin/add-product => GET
-router.get("/add-product", productController.getAddProduct);
-
-// /admin/add-product => POST
-router.post("/add-product", productController.postAddProduct);
+router
+  .route("/add-product")
+  .get(productController.getAddProduct)
+  .post(productController.postAddProduct);
 
 exports.adminRoutes = router;
 exports.products = productController.products;
