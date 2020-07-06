@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 
+const rootDir = require("./util/path");
+
 const app = express();
 
 const { adminRoutes } = require("./routes/admin");
@@ -15,7 +17,7 @@ app.use(shopRoutes);
 
 /* 404 Page */
 app.use("/", (req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
+  res.status(404).sendFile(path.join(rootDir, "views", "404.html"));
 });
 
 /* Start server */
