@@ -1,0 +1,23 @@
+{
+  "name": "nodejs-api",
+  "version": "1.0.0",
+  "description": "This folder is used to keep my files for learning NodeJS restful API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thyAshley/NodeJS-Restful-API.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thyAshley/NodeJS-Restful-API/issues"
+  },
+  "homepage": "https://github.com/thyAshley/NodeJS-Restful-API#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
