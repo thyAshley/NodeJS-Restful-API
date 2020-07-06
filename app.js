@@ -1,4 +1,6 @@
 const express = require("express");
+const path = require("path");
+
 const app = express();
 
 const { adminRoutes } = require("./routes/admin");
@@ -13,7 +15,7 @@ app.use(shopRoutes);
 
 /* 404 Page */
 app.use("/", (req, res) => {
-  res.status(404).send("THIS PAGE DOES NOT EXIST");
+  res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
 });
 
 /* Start server */
