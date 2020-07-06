@@ -18,8 +18,6 @@ app.use(express.static("public"));
 /* Set up Routers for express */
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
-
-/* 404 Page */
 app.use("/", errorController.pageNotFound);
 
 /* Start server */
