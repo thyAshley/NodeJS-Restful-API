@@ -1,26 +1,24 @@
-const express = require("express");
 const path = require("path");
 
-const { adminRoutes } = require("./routes/admin");
-const { shopRoutes } = require("./routes/shop");
+const express = require("express");
+const bodyParser = require("body-parser");
+
 const errorController = require("./controllers/errorController");
 
 const app = express();
 
-/* Set up templating engine */
 app.set("view engine", "ejs");
 app.set("views", "views");
 
-/* Set up middleware for express */
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
 
-/* Set up Routers for express */
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
-app.use("/", errorController.pageNotFound);
 
-/* Start server */
-app.listen(3000, () => {
-  console.log("server started on port 3000");
-});
+app.use(errorController.get404);
+
+app.listen(3000);
