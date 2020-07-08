@@ -10,11 +10,11 @@ const p = path.join(
 
 module.exports = class Cart {
   static addProduct(id, prodPrice) {
-    fs.readFile(p, (err, fileContent) => {
-      let cart = { products: [], totalPrice: 0 };
-      if (!err) {
-        cart = JSON.parse(fileContent) || { products: [], totalPrice: 0 };
-      }
+    fs.readFile(p, "utf-8", (err, fileContent) => {
+      let cart =
+        fileContent === ""
+          ? { products: [], totalPrice: 0 }
+          : JSON.parse(fileContent);
       console.log(cart);
       const existingProductIndex = cart.products.findIndex(
         (prod) => prod.id === id
