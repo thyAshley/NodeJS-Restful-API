@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const Cart = require("./cartModel");
 
 const p = path.join(
   path.dirname(process.mainModule.filename),
@@ -8,8 +9,8 @@ const p = path.join(
 );
 
 const getProductsFromFile = (cb) => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
+  fs.readFile(p, "utf-8", (err, fileContent) => {
+    if (!fileContent) {
       cb([]);
     } else {
       cb(JSON.parse(fileContent));
@@ -18,7 +19,8 @@ const getProductsFromFile = (cb) => {
 };
 
 module.exports = class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(id, title, imageUrl, description, price) {
+    this.id = id;
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
@@ -27,11 +29,40 @@ module.exports = class Product {
 
   save() {
     getProductsFromFile((products) => {
-      this.id = products.length;
-      products.push(this);
-      fs.writeFile(p, JSON.stringify(products), (err) => {
-        console.log(err);
+      const existingProductIndex = products.findIndex(
+        (prod) => prod.id === this.id
+      );
+      console.log(existingProductIndex);
+      if (this.id) {
+        const existingProductIndex = products.findIndex(
+          (prod) => prod.id == this.id
+        );
+        const updatedProducts = [...products];
+        updatedProducts[existingProductIndex] = this;
+        fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+          if (err) console.log(err);
+        });
+      } else {
+        this.id = products.length;
+        products.push(this);
+        fs.writeFile(p, JSON.stringify(products), (err) => {
+          if (err) console.log(err);
+        });
+      }
+    });
+  }
+
+  static deleteById(id) {
+    getProductsFromFile((products) => {
+      const product = products.find((prod) => prod.id == id);
+      const updatedProducts = products.filter((prod) => prod.id !== id);
+      console.log(product, updatedProducts);
+      fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+        if (!err) {
+          Cart.deleteById(id, product.price);
+        }
       });
+      cb(product);
     });
   }
 
