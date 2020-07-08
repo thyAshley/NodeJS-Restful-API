@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { resolveSoa } = require("dns");
 
 const p = path.join(
   path.dirname(process.mainModule.filename),
@@ -12,8 +13,9 @@ module.exports = class Cart {
     fs.readFile(p, (err, fileContent) => {
       let cart = { products: [], totalPrice: 0 };
       if (!err) {
-        cart = JSON.parse(fileContent);
+        cart = JSON.parse(fileContent) || { products: [], totalPrice: 0 };
       }
+      console.log(cart);
       const existingProductIndex = cart.products.findIndex(
         (prod) => prod.id === id
       );
@@ -28,9 +30,10 @@ module.exports = class Cart {
         updatedProduct = { id: id, qty: 1 };
         cart.products = [...cart.products, updatedProduct];
       }
+
       cart.totalPrice += +prodPrice;
       fs.writeFile(p, JSON.stringify(cart), (err) => {
-        console.log("here", err);
+        if (err) console.log(err);
       });
     });
   }
