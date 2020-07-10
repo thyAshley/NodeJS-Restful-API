@@ -34,6 +34,13 @@ class Product {
     const db = getDb();
     return db.collection("products").findOne({ _id: mongodb.ObjectID(prodId) });
   }
+
+  static deleteById(prodId) {
+    const db = getDb();
+    return db
+      .collection("products")
+      .deleteOne({ _id: mongodb.ObjectID(prodId) });
+  }
 }
 
 module.exports = Product;
