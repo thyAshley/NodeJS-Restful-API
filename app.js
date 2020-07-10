@@ -8,6 +8,7 @@ const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
 const mongo = require("./util/database");
+const User = require("./models/userModel");
 
 const app = express();
 
@@ -16,6 +17,18 @@ app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use((req, res, next) => {
+  User.findById("5f08483d0d70ad3728c431ce")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      next();
+    });
+});
 
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
