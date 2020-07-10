@@ -1,4 +1,4 @@
-const Product = require("../models/product");
+const Product = require("../models/productModel");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -13,14 +13,17 @@ exports.getEditProduct = (req, res, next) => {
   const productId = req.params.productId;
   if (!editMode) res.redirect("/");
 
-  Product.findByPk(productId)
+  req.user
+    .getProducts({ where: { id: productId } })
     .then((prod) => {
+      console.log(prod);
       if (!prod) return res.redirect("/");
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
         path: "/admin/edit-product",
         editing: editMode,
-        prods: prod,
+        prods: prod[0],
+        userId: req.user.id,
       });
     })
     .catch((err) => console.log(err));
@@ -37,13 +40,6 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, price, imageUrl, description } = req.body;
-  const updatedProduct = new Product(
-    productId,
-    title,
-    imageUrl,
-    description,
-    price
-  );
   Product.findByPk(productId)
     .then((product) => {
       (product.title = title),
@@ -64,24 +60,31 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  Product.create({
-    title,
-    imageUrl,
-    price,
-    description,
-  })
+  req.user
+    .createProduct({
+      title,
+      imageUrl,
+      price,
+      description,
+    })
     .then((result) => res.redirect("/admin/products"))
     .catch((err) => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
-    .then((products) => {
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",
-      });
-    })
-    .catch((err) => console.log(err));
+  console.log(req.user);
+  if (req.user) {
+    req.user
+      .getProducts()
+      .then((products) => {
+        res.render("admin/products", {
+          prods: products,
+          pageTitle: "Admin Products",
+          path: "/admin/products",
+        });
+      })
+      .catch((err) => console.log(err));
+  } else {
+    res.redirect("/");
+  }
 };
