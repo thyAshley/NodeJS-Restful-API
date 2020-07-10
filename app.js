@@ -6,7 +6,7 @@ require("dotenv").config();
 const errorController = require("./controllers/errorController");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
-const mongoConnect = require("./util/database");
+const mongo = require("./util/database");
 
 const app = express();
 
@@ -21,8 +21,7 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect((client) => {
-  console.log(client);
+mongo.mongoConnect((client) => {
   app.listen(3000, () => {
     console.log("Server started at port 3000");
   });

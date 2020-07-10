@@ -1,28 +1,29 @@
-// const Sequelize = require("sequelize");
-// const sequelize = new Sequelize("node-complete", "root", "test123", {
-//   dialect: "mysql",
-//   host: "localhost",
-//   logging: false,
-// });
-
-// module.exports = sequelize;
-
 const mongodb = require("mongodb");
 
 const MongoClient = mongodb.MongoClient;
 
-console.log(process.env.MONGO_PASSWORD);
+let _db;
+
 const mongoConnect = (callback) => {
   MongoClient.connect(
-    `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/<dbname>?retryWrites=true&w=majority`
+    `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`,
+    { useUnifiedTopology: true }
   )
     .then((client) => {
       console.log("Connected to MongoDB Atlas");
+      _db = client.db();
       callback(client);
     })
     .catch((err) => {
       console.log(err);
+      throw err;
     });
 };
 
-module.exports = mongoConnect;
+const getDb = () => {
+  if (_db) return _db;
+  throw "No database found";
+};
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
