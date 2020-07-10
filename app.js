@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const errorController = require("./controllers/errorController");
 const adminRoutes = require("./routes/admin");
+const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
 const mongo = require("./util/database");
 
@@ -16,6 +17,7 @@ app.set("views", "views");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(userRoutes);
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
