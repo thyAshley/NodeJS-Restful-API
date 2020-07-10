@@ -48,7 +48,7 @@ Order.hasMany(OrderItem);
 Order.belongsToMany(Product, { through: OrderItem });
 
 sequelize
-  .sync({ force: true })
+  .sync()
   .then((result) => {
     User.findByPk(1)
       .then((user) => {
@@ -62,7 +62,7 @@ sequelize
       })
       .then((user) => {
         console.log("User created");
-        user.createCart();
+        return user.createCart();
       })
       .then((cart) => {
         console.log("cart created");
