@@ -8,14 +8,16 @@ const Product = require("./models/productModel");
 const User = require("./models/userModel");
 const Cart = require("./models/cartModel");
 const CartItem = require("./models/cartItemModel");
+const OrderItem = require("./models/orderItemModel");
+const Order = require("./models/orderModel");
+
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
 
 const app = express();
 
 app.set("view engine", "ejs");
 app.set("views", "views");
-
-const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -40,9 +42,13 @@ User.hasOne(Cart);
 Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.hasMany(OrderItem);
+Order.belongsToMany(Product, { through: OrderItem });
 
 sequelize
-  .sync()
+  .sync({ force: true })
   .then((result) => {
     User.findByPk(1)
       .then((user) => {

@@ -16,7 +16,6 @@ exports.getEditProduct = (req, res, next) => {
   req.user
     .getProducts({ where: { id: productId } })
     .then((prod) => {
-      console.log(prod);
       if (!prod) return res.redirect("/");
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
@@ -49,7 +48,6 @@ exports.postEditProduct = (req, res, next) => {
       return product.save();
     })
     .then((result) => {
-      console.log("Update Successful");
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
@@ -72,7 +70,6 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  console.log(req.user);
   if (req.user) {
     req.user
       .getProducts()
