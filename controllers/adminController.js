@@ -1,5 +1,3 @@
-const mongodb = require("mongodb");
-
 const Product = require("../models/productModel");
 
 exports.getAddProduct = (req, res, next) => {
@@ -28,27 +26,26 @@ exports.getEditProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.postEditProduct = (req, res, next) => {
+exports.postEditProduct = async (req, res, next) => {
   const { productId, title, price, imageUrl, description } = req.body;
-  const product = new Product({
-    title,
-    price,
-    imageUrl,
-    description,
-    id: mongodb.ObjectID(productId),
-  });
-  console.log(product);
-  product
-    .save()
-    .then((result) => {
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
+  Product.findOneAndUpdate(
+    { _id: productId },
+    {
+      title,
+      price,
+      description,
+      imageUrl,
+    },
+    (err, res) => {
+      if (err) console.log(err);
+    }
+  );
+  res.redirect("/admin/products");
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
+  Product.findByIdAndDelete(prodId)
     .then(() => {
       res.redirect("/admin/products");
     })
@@ -57,15 +54,7 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const { title, price, imageUrl, description } = req.body;
-  const product = new Product(
-    title,
-    price,
-    imageUrl,
-    description,
-    null,
-    req.user._id
-  );
-  console.log(product, req.user);
+  const product = new Product({ title, price, imageUrl, description });
   product
     .save()
     .then((result) => res.redirect("/admin/products"))
@@ -73,7 +62,7 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((result) => {
       res.render("admin/products", {
         pageTitle: "Admin Product",

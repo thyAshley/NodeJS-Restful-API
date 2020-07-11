@@ -47,6 +47,7 @@
 //   }
 // }
 const mongoose = require("mongoose");
+
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -66,5 +67,4 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-const Product = mongoose.model("product", (schema = productSchema));
-module.exports = Product;
+module.exports = mongoose.model("Product", (schema = productSchema));
