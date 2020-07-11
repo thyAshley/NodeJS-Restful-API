@@ -30,7 +30,6 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, price, imageUrl, description } = req.body;
-  console.log(mongodb.ObjectID(productId));
   const product = new Product({
     title,
     price,
@@ -57,7 +56,16 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const product = new Product(req.body);
+  const { title, price, imageUrl, description } = req.body;
+  const product = new Product(
+    title,
+    price,
+    imageUrl,
+    description,
+    null,
+    req.user._id
+  );
+  console.log(product, req.user);
   product
     .save()
     .then((result) => res.redirect("/admin/products"))

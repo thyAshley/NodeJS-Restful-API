@@ -19,15 +19,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findById("5f08483d0d70ad3728c431ce")
+  User.findById("5f0951d66b827a29b0ed7761")
     .then((user) => {
-      req.user = user;
-      next();
+      req.user = new User(user.name, user.email, user.cart, user._id);
     })
     .catch((err) => {
       console.log(err);
-      next();
     });
+  next();
 });
 
 app.use(userRoutes);
