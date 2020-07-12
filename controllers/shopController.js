@@ -87,39 +87,16 @@ exports.postCart = async (req, res, next) => {
 //     .catch((err) => console.log(err));
 // };
 
-// exports.postOrder = (req, res, next) => {
-//   let fetchedCart;
-//   req.user
-//     .getCart()
-//     .then((cart) => {
-//       fetchedCart = cart;
-//       return cart.getProducts();
-//     })
-//     .then((products) => {
-//       return req.user
-//         .createOrder()
-//         .then((order) => {
-//           order.addProducts(
-//             products.map((product) => {
-//               product.orderItem = {
-//                 quantity: product.cartItem.quantity,
-//               };
-//               return product;
-//             })
-//           );
-//         })
-//         .then(() => {
-//           return fetchedCart.setProducts(null);
-//         })
-//         .then((result) => {
-//           res.redirect("/orders");
-//         })
-//         .catch((err) => console.log(err));
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
+exports.postOrder = (req, res, next) => {
+  req.user
+    .addOrder()
+    .then((result) => {
+      res.redirect("/orders");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 // exports.getCheckout = (req, res, next) => {
 //   res.render("shop/checkout", {

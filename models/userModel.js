@@ -47,12 +47,13 @@ userSchema.method("addToCart", function (product) {
     });
   }
   this.cart = {
+    ...this.cart,
     items: updatedCartItems,
   };
   return this.save();
 });
 
-userSchema.method("removeFromCart", function (product) {
+userSchema.methods.removeFromCart = function (product) {
   const cartItems = [...this.cart.items].filter((cp) => {
     return cp.productId.toString() !== product.toString();
   });
@@ -60,6 +61,6 @@ userSchema.method("removeFromCart", function (product) {
     items: cartItems,
   };
   return this.save();
-});
+};
 
 module.exports = mongoose.model("User", (schema = userSchema));
