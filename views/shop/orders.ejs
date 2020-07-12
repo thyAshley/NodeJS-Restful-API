@@ -7,18 +7,14 @@
             <% if (!orders) { %>
                 <h1>Nothing there!</h1>
             <% } else { %>
-                <ul>
-                    <% orders.forEach(order => { %>
-                        <li>
-                            <h1># <%=order.id %></h1>
-                            <ul>
-                                <% order.products.forEach(product => { %>
-                                    <li><%=product.title%> (<%=product.orderItem.quantity%>)</li>
-                                <% }) %>
-                            </ul>
-                        </li>
-                    <% }) %>
-                </ul>>
+                <% orders.forEach(order => { %>
+                    <ul>Order id: <%=order._id %>
+                        <% order.products.forEach(product => { %>
+                            <li><%=product.productData.title%> (<%=product.quantity%>)</li>
+                        <% }) %>
+                    </ul>
+                <% }) %>
+                
             <% } %>
         </main>
         <%- include('../includes/end.ejs') %>
