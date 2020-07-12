@@ -54,7 +54,13 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const { title, price, imageUrl, description } = req.body;
-  const product = new Product({ title, price, imageUrl, description });
+  const product = new Product({
+    title,
+    price,
+    imageUrl,
+    description,
+    userId: req.user._id,
+  });
   product
     .save()
     .then((result) => res.redirect("/admin/products"))

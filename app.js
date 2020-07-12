@@ -6,10 +6,13 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const errorController = require("./controllers/errorController");
+
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
+
 const User = require("./models/userModel");
+const { DH_CHECK_P_NOT_SAFE_PRIME } = require("constants");
 
 const app = express();
 
@@ -19,16 +22,17 @@ app.set("views", "views");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use((req, res, next) => {
-//   User.findById("5f0951d66b827a29b0ed7761")
-//     .then((user) => {
-//       req.user = new User(user.name, user.email, user.cart, user._id);
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-//   next();
-// });
+app.use((req, res, next) => {
+  User.findById("5f0a65c59e10de08882a2e68")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      next();
+    });
+});
 
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
@@ -41,8 +45,22 @@ mongoose
     `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
+
   .then((res) => {
     console.log("connected to mongodb Atlas");
+    User.findOne().then((result) => {
+      if (!result) {
+        const user = new User({
+          name: "Josh",
+          email: "Josh@gmail.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+        console.log("user created");
+      }
+    });
     app.listen(3000, () => {
       console.log("Server started at port 3000");
     });
