@@ -10,6 +10,7 @@ const errorController = require("./controllers/errorController");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 const User = require("./models/userModel");
 const { DH_CHECK_P_NOT_SAFE_PRIME } = require("constants");
@@ -37,7 +38,7 @@ app.use((req, res, next) => {
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
-
+app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
