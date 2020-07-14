@@ -17,6 +17,7 @@ const authRoutes = require("./routes/auth");
 const User = require("./models/userModel");
 
 const MONGODB_URI = `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`;
+
 const app = express();
 const store = new MongoDBStorage({
   uri: MONGODB_URI,
@@ -33,7 +34,6 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  console.log(req.session.user);
   if (req.session.user) {
     User.findById(req.session.user._id)
       .then((user) => {
