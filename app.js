@@ -67,19 +67,6 @@ mongoose
 
   .then((res) => {
     console.log("connected to mongodb Atlas");
-    User.findOne().then((result) => {
-      if (!result) {
-        const user = new User({
-          name: "Josh",
-          email: "Josh@gmail.com",
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-        console.log("user created");
-      }
-    });
     app.listen(3000, () => {
       console.log("Server started at port 3000");
     });
