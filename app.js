@@ -4,6 +4,8 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoDBStorage = require("connect-mongodb-session")(session);
 
 const errorController = require("./controllers/errorController");
 
@@ -13,27 +15,46 @@ const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 
 const User = require("./models/userModel");
-const { DH_CHECK_P_NOT_SAFE_PRIME } = require("constants");
 
+const MONGODB_URI = `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`;
 const app = express();
+const store = new MongoDBStorage({
+  uri: MONGODB_URI,
+  collection: "sessions",
+});
+
+app.use(
+  session({
+    secret: "my session value",
+    resave: false,
+    saveUninitialized: false,
+    store,
+  })
+);
+
+app.use((req, res, next) => {
+  console.log(req.session.user);
+  if (req.session.user) {
+    User.findById(req.session.user._id)
+      .then((user) => {
+        return (req.user = user);
+      })
+      .then(() => {
+        next();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    next();
+  }
+});
 
 app.set("view engine", "ejs");
 app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-
-app.use((req, res, next) => {
-  User.findById("5f0aa9fd366c241dcc6741bd")
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      console.log(err);
-      next();
-    });
-});
 
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
@@ -42,10 +63,7 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect(
-    `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`,
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
   .then((res) => {
     console.log("connected to mongodb Atlas");
