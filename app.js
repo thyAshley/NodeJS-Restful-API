@@ -62,6 +62,12 @@ app.set("views", "views");
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use((req, res, next) => {
+  res.locals.isAuth = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
