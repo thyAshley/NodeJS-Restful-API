@@ -19,6 +19,7 @@ const User = require("./models/userModel");
 const MONGODB_URI = `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`;
 
 const app = express();
+
 const store = new MongoDBStorage({
   uri: MONGODB_URI,
   collection: "sessions",

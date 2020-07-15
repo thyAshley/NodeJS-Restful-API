@@ -1,5 +1,4 @@
 const User = require("../models/userModel");
-
 const bcrypt = require("bcryptjs");
 
 exports.getLogin = (req, res, next) => {
