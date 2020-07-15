@@ -36,6 +36,7 @@ exports.getIndex = (req, res, next) => {
         pageTitle: "Shop",
         path: "/",
         isAuth: req.session.isAuth,
+        csrfToken: req.csrfToken(),
       });
     })
     .catch((err) => console.log(err));

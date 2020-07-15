@@ -6,15 +6,15 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStorage = require("connect-mongodb-session")(session);
+const csrf = require("csurf");
 
 const errorController = require("./controllers/errorController");
+const User = require("./models/userModel");
 
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
-
-const User = require("./models/userModel");
 
 const MONGODB_URI = `mongodb+srv://admin-ashley:${process.env.MONGO_PASSWORD}@testdb-ukelm.mongodb.net/shop?retryWrites=true&w=majority`;
 
@@ -25,6 +25,8 @@ const store = new MongoDBStorage({
   collection: "sessions",
 });
 
+const csrfProtect = csrf();
+
 app.use(
   session({
     secret: "my session value",
@@ -33,6 +35,10 @@ app.use(
     store,
   })
 );
+
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(csrfProtect);
 
 app.use((req, res, next) => {
   if (req.session.user) {
@@ -54,7 +60,6 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 app.set("views", "views");
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(userRoutes);

@@ -6,12 +6,13 @@ exports.getLogin = (req, res, next) => {
     path: "/login",
     pageTitle: "Login",
     isAuth: req.session.isAuth,
+    csrfToken: req.csrfToken(),
   });
 };
 
 exports.postLogin = (req, res, next) => {
+  console.log("here");
   const { email, password } = req.body;
-  console.log(email, password);
   User.findOne({ email })
     .then((user) => {
       if (!user) {
@@ -36,14 +37,12 @@ exports.postLogin = (req, res, next) => {
         });
     })
     .catch((err) => {
-      console.log("error");
       console.log(err);
     });
 };
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    console.log(err);
     res.redirect("/");
   });
 };
