@@ -137,9 +137,45 @@ exports.postReset = (req, res, next) => {
             res.redirect("/reset");
           });
         }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600 * 1000;
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect("/");
+        transporter.sendMail({
+          to: "thy.ashley@gmail.com",
+          from: "thyangashley@gmail.com",
+          subject: "Request for password reset from Node Shop",
+          html: `
+          <p>You requested a password reset</p>
+          <p>Click this <a href="http://localhost:3000/reset/${token}">Link</a> to set a new password.</p>
+          `,
+        });
       })
       .catch((err) => {
         console.log(err);
       });
   });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+
+  User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      console.log(user);
+      res.render("auth/new-password", {
+        path: "/new-password",
+        pageTitle: "Reset Password",
+        errorMessage: req.flash("error"),
+        userId: user._id,
+      });
+    })
+    .catch((err) => {
+      console.log("err");
+    });
 };
