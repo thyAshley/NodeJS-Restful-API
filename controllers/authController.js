@@ -44,7 +44,9 @@ exports.postLogin = (req, res, next) => {
             });
           } else {
             req.flash("error", "Invalid Email or Password");
-            return res.redirect("/login");
+            req.session.save(() => {
+              return res.redirect("/login");
+            });
           }
         })
         .catch((err) => {
@@ -161,21 +163,51 @@ exports.postReset = (req, res, next) => {
 
 exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
-
+  console.log(req.flash("error"));
   User.findOne({
     resetToken: token,
     resetTokenExpiration: { $gt: Date.now() },
   })
     .then((user) => {
-      console.log(user);
       res.render("auth/new-password", {
         path: "/new-password",
         pageTitle: "Reset Password",
         errorMessage: req.flash("error"),
         userId: user._id,
+        token: token,
       });
     })
     .catch((err) => {
-      console.log("err");
+      console.log(err);
+    });
+};
+
+exports.postNewPassword = (req, res, next) => {
+  const { password, userId, token } = req.body;
+  let resetUser;
+  User.findOne({
+    _id: userId,
+    resetTokenExpiration: { $gt: Date.now() },
+    resetToken: token,
+  })
+    .then((user) => {
+      if (!user) {
+        req.flash("error", "Please try again,");
+        res.redirect(`/reset/${token}`);
+      }
+      resetUser = user;
+      return bcrypt.hash(password, 10);
+    })
+    .then((hashedPassword) => {
+      resetUser.password = hashedPassword;
+      resetUser.resetToken = undefined;
+      resetUser.resetTokenExpiration = undefined;
+      return resetUser.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+    })
+    .catch((err) => {
+      console.log("fail");
     });
 };
