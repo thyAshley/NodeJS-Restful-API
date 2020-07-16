@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStorage = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
+const flash = require("connect-flash");
 
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
@@ -39,6 +40,7 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(csrfProtect);
+app.use(flash());
 
 app.use((req, res, next) => {
   if (req.session.user) {
@@ -63,7 +65,7 @@ app.set("views", "views");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  res.locals.isAuth = req.session.isLoggedIn;
+  res.locals.isAuth = req.session.isAuth;
   res.locals.csrfToken = req.csrfToken();
   next();
 });

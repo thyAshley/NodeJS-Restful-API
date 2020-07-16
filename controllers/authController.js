@@ -5,18 +5,18 @@ exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
-    isAuth: req.session.isAuth,
     csrfToken: req.csrfToken(),
+    errorMessage: req.flash("error"),
   });
 };
 
 exports.postLogin = (req, res, next) => {
-  console.log("here");
   const { email, password } = req.body;
   User.findOne({ email })
     .then((user) => {
       if (!user) {
-        console.log("user does not exist");
+        req.flash("error", "Invalid Email or Password");
+        return res.redirect("/login");
       }
       bcrypt
         .compare(password, user.password)
@@ -51,7 +51,6 @@ exports.getSignup = (req, res, next) => {
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
-    isAuth: false,
   });
 };
 exports.postSignup = (req, res, next) => {

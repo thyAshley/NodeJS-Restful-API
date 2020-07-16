@@ -216,6 +216,21 @@ form {
   color: white;
 }
 
+.user-message {
+  background-color: #8ea8fd;
+  border-radius: 3px;
+  border: 1px solid #4771fa;
+  margin: auto;
+  padding: 1rem;
+  text-align: center;
+  width: 60%;
+}
+
+.user-message--error {
+  border-color: red;
+  background: #ffb0b0;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;
