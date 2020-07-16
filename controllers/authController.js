@@ -1,5 +1,16 @@
-const User = require("../models/userModel");
+const nodemailer = require("nodemailer");
+const sendGridTransport = require("nodemailer-sendgrid-transport");
 const bcrypt = require("bcryptjs");
+
+const User = require("../models/userModel");
+
+const transport = nodemailer.createTransport(
+  sendGridTransport({
+    auth: {
+      api_key: process.env.NODEMAILER_APIKEY,
+    },
+  })
+);
 
 exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
@@ -16,7 +27,9 @@ exports.postLogin = (req, res, next) => {
     .then((user) => {
       if (!user) {
         req.flash("error", "Invalid Email or Password");
-        return res.redirect("/login");
+        req.session.save(() => {
+          return res.redirect("/login");
+        });
       }
       bcrypt
         .compare(password, user.password)
@@ -29,6 +42,7 @@ exports.postLogin = (req, res, next) => {
               return res.redirect("/");
             });
           } else {
+            req.flash("error", "Invalid Email or Password");
             return res.redirect("/login");
           }
         })
@@ -51,13 +65,17 @@ exports.getSignup = (req, res, next) => {
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
+    errorMessage: req.flash("error"),
   });
 };
 exports.postSignup = (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
   User.findOne({ email })
     .then((user) => {
-      if (user) return res.redirect("/login");
+      if (user) {
+        req.flash("error", "Email already exist");
+        return res.redirect("/signup");
+      }
       return bcrypt
         .hash(password, 10)
         .then((hashedPassword) => {
