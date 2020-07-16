@@ -1,10 +1,11 @@
 const nodemailer = require("nodemailer");
 const sendGridTransport = require("nodemailer-sendgrid-transport");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const User = require("../models/userModel");
 
-const transport = nodemailer.createTransport(
+const transporter = nodemailer.createTransport(
   sendGridTransport({
     auth: {
       api_key: process.env.NODEMAILER_APIKEY,
@@ -88,6 +89,16 @@ exports.postSignup = (req, res, next) => {
         })
         .then((user) => {
           res.redirect("/login");
+          return transporter
+            .sendMail({
+              to: email,
+              from: "thyangashley@gmail.com",
+              subject: "Welcome to Node Shop!",
+              html: "<h1>You successfully signed up</h1>",
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         });
     })
     .catch((err) => {
@@ -100,4 +111,35 @@ exports.protectMiddleware = (req, res, next) => {
     res.redirect("/");
   }
   next();
+};
+
+exports.getReset = (req, res, next) => {
+  res.render("auth/reset", {
+    path: "/reset",
+    pageTitle: "Password Reset",
+    errorMessage: req.flash("error"),
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/reset");
+    }
+    const token = buffer.toString("hex");
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash("error", "No account with that email found!");
+          req.session.save((err) => {
+            if (err) console.log(err);
+            res.redirect("/reset");
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 };

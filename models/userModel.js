@@ -24,6 +24,8 @@ const userSchema = new mongoose.Schema({
       },
     ],
   },
+  resetToken: String,
+  resetTokenExpiration: Date,
 });
 
 userSchema.method.log = function () {
