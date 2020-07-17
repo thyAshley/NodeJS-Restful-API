@@ -110,7 +110,7 @@ exports.postSignup = (req, res, next) => {
 
 exports.protectMiddleware = (req, res, next) => {
   if (!req.session.isAuth) {
-    res.redirect("/");
+    return res.redirect("/");
   }
   next();
 };

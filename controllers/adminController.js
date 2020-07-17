@@ -28,24 +28,32 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = async (req, res, next) => {
   const { productId, title, price, imageUrl, description } = req.body;
-  Product.findOneAndUpdate(
-    { _id: productId },
-    {
-      title,
-      price,
-      description,
-      imageUrl,
-    },
-    (err, res) => {
-      if (err) console.log(err);
+  Product.findById(productId).then((product) => {
+    if (product.userId.toString() !== req.user._id.toString()) {
+      return res.redirect("/");
     }
-  );
-  res.redirect("/admin/products");
+    product.title = title;
+    product.productId = productId;
+    product.price = price;
+    product.imageUrl = imageUrl;
+    product.description = description;
+
+    console.log(product);
+    return product
+      .save()
+      .then((result) => {
+        console.log("updated!");
+        res.redirect("/admin/products");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndDelete(prodId)
+  Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then(() => {
       res.redirect("/admin/products");
     })
