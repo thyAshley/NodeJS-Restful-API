@@ -68,7 +68,7 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     .then((result) => {
       res.render("admin/products", {
         pageTitle: "Admin Product",
