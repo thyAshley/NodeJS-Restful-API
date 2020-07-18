@@ -4,6 +4,9 @@ const { check, body } = require("express-validator");
 const router = express.Router();
 
 const authController = require("../controllers/authController");
+
+const User = require("../models/userModel");
+
 router
   .route("/login")
   .get(authController.getLogin)
@@ -16,7 +19,17 @@ router
   .get(authController.getSignup)
   .post(
     [
-      check("email", "Please enter a valid email").isEmail(),
+      check("email", "Please enter a valid email")
+        .isEmail()
+        .custom((value, { req }) => {
+          return User.findOne({ email: value }).then((user) => {
+            if (user) {
+              return Promise.reject(
+                "Email exist already, please pick a different email"
+              );
+            }
+          });
+        }),
       body("password", "Please enter a valid password")
         .isLength({ min: 5 })
         .isAlphanumeric(),
