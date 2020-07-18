@@ -1,4 +1,5 @@
 const express = require("express");
+const { body } = require("express-validator");
 
 const adminController = require("../controllers/adminController");
 const authController = require("../controllers/authController");
@@ -19,6 +20,12 @@ router.get(
 
 router.post(
   "/add-product",
+  [
+    body("title").isAlphanumeric().isLength({ min: 3 }).trim(),
+    body("imageURL", "Url must be valid").isURL().trim(),
+    body("price").isNumeric().trim(),
+    body("description").isLength({ min: 5, max: 400 }).trim(),
+  ],
   authController.protectMiddleware,
   adminController.postAddProduct
 );
@@ -31,6 +38,12 @@ router.get(
 
 router.post(
   "/edit-product",
+  [
+    body("title").isAlphanumeric().isLength({ min: 3 }).trim(),
+    body("imageURL", "Url must be valid").isURL().trim(),
+    body("price").isNumeric().trim(),
+    body("description").isLength({ min: 5, max: 400 }).trim(),
+  ],
   authController.protectMiddleware,
   adminController.postEditProduct
 );
