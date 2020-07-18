@@ -10,7 +10,7 @@ const User = require("../models/userModel");
 router
   .route("/login")
   .get(authController.getLogin)
-  .post(authController.postLogin);
+  .post(body("email").isEmail().normalizeEmail(), authController.postLogin);
 
 router.post("/logout", authController.postLogout);
 
@@ -21,6 +21,7 @@ router
     [
       check("email", "Please enter a valid email")
         .isEmail()
+        .normalizeEmail()
         .custom((value, { req }) => {
           return User.findOne({ email: value }).then((user) => {
             if (user) {
@@ -32,7 +33,8 @@ router
         }),
       body("password", "Please enter a valid password")
         .isLength({ min: 5 })
-        .isAlphanumeric(),
+        .isAlphanumeric()
+        .trim(),
       body("confirmPassword", "Password does not match").custom(
         (value, { req }) => {
           if (req.body.password === value) {

@@ -20,6 +20,10 @@ exports.getLogin = (req, res, next) => {
     pageTitle: "Login",
     csrfToken: req.csrfToken(),
     errorMessage: req.flash("error"),
+    oldInput: {
+      email: "",
+      password: "",
+    },
   });
 };
 
@@ -28,45 +32,57 @@ exports.postLogin = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(422).render("auth/signup", {
-      path: "/signup",
-      pageTitle: "Signup",
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
       errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+      },
     });
   }
-
-  User.findOne({ email })
-    .then((user) => {
-      if (!user) {
-        req.flash("error", "Invalid Email or Password");
-        req.session.save(() => {
-          return res.redirect("/login");
-        });
-      }
-      bcrypt
-        .compare(password, user.password)
-        .then((doMatch) => {
-          if (doMatch) {
-            req.session.isAuth = true;
-            req.session.user = user;
-            req.session.save((err) => {
-              if (err) console.log(err);
-              return res.redirect("/");
-            });
-          } else {
-            req.flash("error", "Invalid Email or Password");
-            req.session.save(() => {
-              return res.redirect("/login");
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  User.findOne({ email }).then((user) => {
+    if (!user) {
+      return res.status(422).render("auth/login", {
+        path: "/login",
+        pageTitle: "Login",
+        errorMessage: "Invalid Email or Password",
+        oldInput: {
+          email,
+          password,
+        },
+      });
+    }
+    bcrypt
+      .compare(password, user.password)
+      .then((doMatch) => {
+        if (doMatch) {
+          req.session.isAuth = true;
+          req.session.user = user;
+          req.session.save((err) => {
+            if (err) console.log(err);
+            return res.redirect("/");
+          });
+        } else {
+          return res.status(422).render("auth/login", {
+            path: "/login",
+            pageTitle: "Login",
+            errorMessage: "Invalid Email or Password",
+            oldInput: {
+              email,
+              password,
+            },
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -85,11 +101,13 @@ exports.getSignup = (req, res, next) => {
       password: "",
       confirmPassword: "",
     },
+    validationErrors: [],
   });
 };
 exports.postSignup = (req, res, next) => {
   const { email, password } = req.body;
   const errors = validationResult(req);
+  console.log(errors.array());
   if (!errors.isEmpty()) {
     return res.status(422).render("auth/signup", {
       path: "/signup",
@@ -100,6 +118,7 @@ exports.postSignup = (req, res, next) => {
         password,
         confirmPassword: req.body.confirmPassword,
       },
+      validationErrors: errors.array(),
     });
   }
 
